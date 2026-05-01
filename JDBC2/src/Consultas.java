@@ -177,9 +177,49 @@ public class Consultas {
 				
 				break;
 			case 7:
+				System.out.println("indica el código del departamento: ");
+				try {
+					int codi_d = Integer.parseInt(sc.nextLine());
+					System.out.println("indica el porcentaje de aumento de salario (min 1 - max 100):");
+					double cantidad = Double.parseDouble(sc.nextLine());
+					
+					Departament filtrado = gestor.consultaDepartamentPerCodi(codi_d);
+					int empModificados = gestor.aumentarSalarioPorDepartamento(filtrado, (cantidad/100)+1);
+					
+					if(empModificados > 0) System.out.println("Se ha subido el sueldo a "+empModificados+" empleados de:\n"+filtrado);
+					else if(empModificados == 0) System.out.println("no se ha modificado ni 1 salario");
+					
+				} catch (NumberFormatException e) {
+					
+					System.out.println(e.getMessage());
+				}catch (SQLException e) {
+					
+					System.out.println(e.getMessage());
+				}
 				
 				break;
 			case 8:
+				System.out.println("Introduce el ID del empleado: ");
+				
+				try {
+					
+					int id_emp = Integer.parseInt(sc.nextLine());
+					System.out.println("introduce la nueva comisión del empleado "+id_emp);
+					double com = Double.parseDouble(sc.nextLine());
+					int result = gestor.modificarComisionPorCodi(id_emp, com);
+					
+					if(result == 1) System.out.println("Se ha modificado la comision de id: '"+id_emp+"' a "+com+"€");
+					else if(result == 0) System.out.println("No se ha modificado ni 1 comisión.");
+					
+				} catch (NumberFormatException e) {
+					
+					System.out.println(e.getMessage());
+					
+				} catch (SQLException e) {
+					
+					System.out.println(e.getMessage());
+					
+				}
 				
 				break;
 				
@@ -188,7 +228,9 @@ public class Consultas {
 			}
 		}
 		System.out.println("Adios!\n");
+		
 		GestorConnexions.tancarConnexio();
+		sc.close();
 		
 		
 		
@@ -202,7 +244,7 @@ public class Consultas {
 		System.out.println("3 -> Añadir un departamento a la BD.");
 		System.out.println("4 -> Eliminar un departamento de la BD.");
 		System.out.println("5 -> Eliminar un empleado de la BD.");
-		System.out.println("6 -> Añadir empleado a la BD. IMPLEMENTADO HASTA AQUI" );
+		System.out.println("6 -> Añadir empleado a la BD." );
 		System.out.println("7 -> Aumentar salario a los trabajadores de un departamento. en %");
 		System.out.println("8 -> Modificar la comisión de un empleado.");
 		System.out.println("0 -> SALIR");

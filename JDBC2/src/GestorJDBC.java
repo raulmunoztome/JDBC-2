@@ -92,6 +92,7 @@ public class GestorJDBC {
     	
     	return ps.executeUpdate();
  	}
+ 	
  	public int addEmpleat(Empleat emp)throws SQLException {
  		Connection con = GestorConnexions.obtenirConnexio();
     	
@@ -121,6 +122,7 @@ public class GestorJDBC {
  		
  		return prepared.executeUpdate();
  	}
+ 	
  	public int deleteEmpleat(Empleat emp) throws SQLException{
  		Connection con = GestorConnexions.obtenirConnexio();
  		String sql = "DELETE FROM EMPLEATS "
@@ -131,6 +133,7 @@ public class GestorJDBC {
  		
  		return prepared.executeUpdate();
  	}
+ 	
  	public Departament consultaDepartamentPerCodi(int codiD) throws SQLException {
  		
  		Connection con = GestorConnexions.obtenirConnexio();
@@ -141,13 +144,42 @@ public class GestorJDBC {
  		preparo.setInt(1,codiD);
  		
  		ResultSet recibido = preparo.executeQuery();
- 				if(recibido.next()) {
- 					return (new Departament(recibido.getInt(1),recibido.getString(2),recibido.getString(3)));
- 				}
- 				return null;
+ 		
+ 		if(recibido.next()) {
+ 				return (new Departament(recibido.getInt(1),recibido.getString(2),recibido.getString(3)));
+ 		}
+ 		
+ 		return null;
  			
  		
  		
+ 	}
+ 	public int aumentarSalarioPorDepartamento(Departament dep, double porcentaje) throws SQLException {
+ 		Connection con = GestorConnexions.obtenirConnexio();
+ 		
+ 		String sql = "UPDATE EMPLEATS SET salari = salari * ? "
+ 				+ "WHERE codi_dept = ?";
+ 		
+ 		if(porcentaje < 0) return 0;
+ 		
+ 		PreparedStatement prep = con.prepareStatement(sql);
+ 		prep.setDouble(1, porcentaje);
+ 		prep.setInt(2, dep.getCodi_dept());
+ 		
+ 		return prep.executeUpdate();
+ 		
+ 	}
+ 	public int modificarComisionPorCodi(int codi_em, double com) throws SQLException {
+ 		Connection con = GestorConnexions.obtenirConnexio();
+ 		String sql = "UPDATE EMPLEATS SET comissio = ? WHERE codi_emp = ?";
+ 		
+ 		if(codi_em == 0 || com < 0)return 0;
+ 		
+ 		PreparedStatement prepared = con.prepareStatement(sql);
+ 		prepared.setDouble(1, com);
+ 		prepared.setInt(2, codi_em);
+ 		
+ 		return prepared.executeUpdate();
  	}
  	     
  }
