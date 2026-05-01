@@ -81,7 +81,7 @@ public class Departament {
 
 	@Override
 	public String toString() {
-		return "Departament [codi_dept=" + codi_dept + ", nom=" + nom + ", ciutat=" + ciutat + ", Empleados= "+empleados.size()+"]";
+		return "Departament [codi_dept=" + codi_dept + ", nom=" + nom + ", ciutat=" + ciutat + "]";
 	}
 	
 	

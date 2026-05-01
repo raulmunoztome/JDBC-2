@@ -1,4 +1,5 @@
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -20,11 +21,12 @@ public class GestorJDBC {
 	 
 	 String sql;
 	 Departament dep = null;
-	 Map<Integer,Departament> listado = new HashMap<>();
+	 Map<Integer,Departament> listado;
 	 Connection conex = GestorConnexions.obtenirConnexio();
      
      
 	 if(ambEmpleats) {
+		 listado = new HashMap<>();
 		 sql = "SELECT D.*,E.* FROM DEPARTAMENTS D"
 		 		+ " LEFT JOIN EMPLEATS E ON D.codi_dept = E.codi_dept";
 	     try (Statement st = conex.createStatement(); ResultSet resultat = st.executeQuery(sql)){
@@ -52,6 +54,10 @@ public class GestorJDBC {
 
 				System.out.println(e.getMessage());
 				return null;
+				
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				return null;
 			}
 	     
 	 }
@@ -73,6 +79,76 @@ public class GestorJDBC {
 			}
 	     
 	 }
-     
+ 
+ 	public int addDepartamento(Departament dep) throws SQLException {
+ 		Connection con = GestorConnexions.obtenirConnexio();
+    	
+    	String sql = "INSERT INTO departaments VALUES (?,?,?)";
+    	PreparedStatement ps = con.prepareStatement(sql);
+    	
+    	ps.setInt(1, dep.getCodi_dept());
+    	ps.setString(2, dep.getNom());
+    	ps.setString(3, dep.getCiutat());
+    	
+    	return ps.executeUpdate();
+ 	}
+ 	public int addEmpleat(Empleat emp)throws SQLException {
+ 		Connection con = GestorConnexions.obtenirConnexio();
+    	
+    	String sql = "INSERT INTO empleats (codi_emp,cognom,ofici,data_alta,salari,comissio,codi_dept) VALUES (?,?,?,?,?,?,?)";
+    	PreparedStatement ps = con.prepareStatement(sql);
+    	
+    	ps.setInt(1, emp.getCodi_emp());
+    	ps.setString(2, emp.getCognom());
+    	ps.setString(3, emp.getOfici());
+    	ps.setDate(4,java.sql.Date.valueOf(emp.getData_alta()));
+    	ps.setDouble(5, emp.getSalari());
+    	ps.setDouble(6, emp.getComissio());
+    	ps.setInt(7, emp.getDepartament().getCodi_dept());
+    	
+    	
+    	return ps.executeUpdate();
+ 	}
+ 	
+ 	
+ 	public int deleteDepartamento(Departament dep) throws SQLException{
+ 		Connection con = GestorConnexions.obtenirConnexio();
+ 		String sql = "DELETE FROM departaments "
+ 				+ "WHERE codi_dept = ?";
+ 		
+ 		PreparedStatement prepared = con.prepareStatement(sql);
+ 		prepared.setInt(1,dep.getCodi_dept());
+ 		
+ 		return prepared.executeUpdate();
+ 	}
+ 	public int deleteEmpleat(Empleat emp) throws SQLException{
+ 		Connection con = GestorConnexions.obtenirConnexio();
+ 		String sql = "DELETE FROM EMPLEATS "
+ 				+ "WHERE codi_emp = ?";
+ 		
+ 		PreparedStatement prepared = con.prepareStatement(sql);
+ 		prepared.setInt(1,emp.getCodi_emp());
+ 		
+ 		return prepared.executeUpdate();
+ 	}
+ 	public Departament consultaDepartamentPerCodi(int codiD) throws SQLException {
+ 		
+ 		Connection con = GestorConnexions.obtenirConnexio();
+ 		String sql = "SELECT * FROM DEPARTAMENTS "
+ 				+ "WHERE codi_dept = ?";
+ 		
+ 		PreparedStatement preparo = con.prepareStatement(sql);
+ 		preparo.setInt(1,codiD);
+ 		
+ 		ResultSet recibido = preparo.executeQuery();
+ 				if(recibido.next()) {
+ 					return (new Departament(recibido.getInt(1),recibido.getString(2),recibido.getString(3)));
+ 				}
+ 				return null;
+ 			
+ 		
+ 		
+ 	}
+ 	     
  }
 
