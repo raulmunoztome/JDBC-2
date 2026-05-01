@@ -73,6 +73,12 @@ public class Empleat {
 	public void setComissio(double comissio) {
 		this.comissio = comissio;
 	}
+
+	@Override
+	public String toString() {
+		return "Empleat [departament=" + departament.getNom() + ", codi_emp=" + codi_emp + ", cognom=" + cognom + ", ofici="
+				+ ofici + ", data_alta=" + data_alta + ", salari=" + salari + ", comissio=" + comissio + "]";
+	}
 	
 	
 	
