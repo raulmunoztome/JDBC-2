@@ -241,12 +241,9 @@ public class Consultas {
 			default:
 				break;
 			}
-			//despues de terminar cada opcion se cierra la conexion y no se deja abierta si el usuario no la vuelve a utilizar
-			GestorConnexions.tancarConnexio();
 		}
 		System.out.println("Adios!\n");
-		
-		
+	
 		sc.close();
 		
 		
