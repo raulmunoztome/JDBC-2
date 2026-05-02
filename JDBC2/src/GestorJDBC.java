@@ -17,7 +17,7 @@ public class GestorJDBC {
 	 
  }
  
- public Set<Departament> MostrarDepartamentos(boolean ambEmpleats) throws Exception, SQLException {
+ public Set<Departament> getDepartaments(boolean ambEmpleats) throws Exception, SQLException {
 	 
 	 String sql;
 	 Departament dep = null;
@@ -107,16 +107,39 @@ public class GestorJDBC {
  	}
  	
  	
- 	public int deleteDepartamento(Departament dep) throws SQLException{
+ 	public int deleteDepartamento(Departament dep, boolean cascade) throws SQLException{
+
  		
- 		String sql = "DELETE FROM departaments "
- 				+ "WHERE codi_dept = ?";
- 		
- 		try(Connection con = GestorConnexions.obtenirConnexio(); PreparedStatement prepared = con.prepareStatement(sql)){
+ 			String sql = "DELETE FROM empleats "
+	 				+ "WHERE codi_dept = ?";
  			
-	 		prepared.setInt(1,dep.getCodi_dept());
-	 		
-	 		return prepared.executeUpdate();
+	 		try(Connection con = GestorConnexions.obtenirConnexio(); PreparedStatement prepared = con.prepareStatement(sql)){
+	 			con.setAutoCommit(false);
+		 		if(cascade) {
+		 	 			
+		 		 	prepared.setInt(1,dep.getCodi_dept());
+		 		 		
+		 		 	prepared.executeUpdate();
+		 		 	
+		 	 		}
+		 		sql = "DELETE FROM departaments "
+		 				+ "WHERE codi_dept = ?";
+		 		
+		 		try(PreparedStatement prep = con.prepareStatement(sql)){
+				 		
+					prep.setInt(1,dep.getCodi_dept());
+					 		
+					int filasAfectadas = prep.executeUpdate();
+					con.commit();
+					
+					return filasAfectadas;
+					
+		 			} catch (SQLException e) {
+		 	            con.rollback(); // Si algo falla, deshacemos todo
+		 	            
+		 	            throw e;	//relanzamos la excepcion al metodo q lo llama
+		 	        }
+
  		}
  	}
  	

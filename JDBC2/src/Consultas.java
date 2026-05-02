@@ -35,7 +35,11 @@ public class Consultas {
 			case 1:
 				//MOSTRAR DEPARTAMENTOS
 				try {
-					listado_resultado = gestor.MostrarDepartamentos(false);
+					listado_resultado = gestor.getDepartaments(false);
+					
+					for(Departament d : listado_resultado) {
+						System.out.println(d);
+					}
 
 				} catch (SQLException e) {
 					System.out.println(e.getMessage());
@@ -43,16 +47,24 @@ public class Consultas {
 				catch (Exception e) {
 					System.out.println(e.getMessage());
 				}
-				for(Departament d : listado_resultado) {
-					System.out.println(d);
-				}
+
 				break;
 				
 			case 2:
 				//MOSTRAR LOS TRABAJADORES DE LOS DEPARTAMENTOS
 				try 
 				{
-					listado_resultado = gestor.MostrarDepartamentos(true);
+					listado_resultado = gestor.getDepartaments(true);
+					
+					for(Departament d : listado_resultado) {
+						
+						System.out.println(d);
+						
+						for(Empleat e : d.getEmpleados()) {
+							
+							System.out.println(e);
+						}
+					}
 					
 				} catch (SQLException e) {
 					
@@ -61,15 +73,7 @@ public class Consultas {
 				catch (Exception e) {
 					System.out.println(e.getMessage());
 				}
-				for(Departament d : listado_resultado) {
-					
-					System.out.println(d);
-					
-					for(Empleat e : d.getEmpleados()) {
-						
-						System.out.println(e);
-					}
-				}
+
 				break;
 				
 			case 3:
@@ -106,7 +110,7 @@ public class Consultas {
 				try {
 					int codi_dep = Integer.parseInt(sc.nextLine());
 					
-					int respuesta = gestor.deleteDepartamento(new Departament(codi_dep,"no-importa","esto-tampoco"));
+					int respuesta = gestor.deleteDepartamento(new Departament(codi_dep,"no-importa","esto-tampoco"), false);
 					
 					if(respuesta == 0)System.out.println("No se ha encontrado ese departamento con ese ID");
 					else if(respuesta == 1)System.out.println("Se ha eliminado el departamento");
