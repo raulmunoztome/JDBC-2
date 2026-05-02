@@ -22,6 +22,7 @@ public class GestorJDBC {
 	 String sql;
 	 Departament dep = null;
 	 Map<Integer,Departament> listado;
+	 //genero la connexion al principio de cada método.
 	 Connection conex = GestorConnexions.obtenirConnexio();
      
      
@@ -31,21 +32,24 @@ public class GestorJDBC {
 		 
 		 sql = "SELECT D.*,E.* FROM DEPARTAMENTS D"
 		 		+ " LEFT JOIN EMPLEATS E ON D.codi_dept = E.codi_dept";
-		 
+		 //no hacemos catch, ya los captura en el main
+		 // solo el try Y entre parentesis el statement y el resultSet si es consulta sencilla
 	     try (Statement st = conex.createStatement(); ResultSet resultat = st.executeQuery(sql)){
 				
 				while (resultat.next()) {
 					
 					int codi_dep = resultat.getInt(1);
+					//si no tengo el dept en el listado lo añado
 					if(!listado.containsKey(codi_dep)) {
 						dep = new Departament(codi_dep,resultat.getString(2),resultat.getString(3));
 						listado.put(codi_dep, dep);
 					}
 					
 					if(resultat.getObject(4) != null){
-
+						//evitamos crear empleados para departamentos SIN empleados
 					Empleat emp = new Empleat(listado.get(codi_dep),resultat.getInt(4),resultat.getString(5),resultat.getString(6),
 							resultat.getDate(7).toLocalDate(),resultat.getDouble(8),resultat.getDouble(9));
+					
 					listado.get(codi_dep).addEmpleado(emp);
 					}
 					
@@ -71,17 +75,22 @@ public class GestorJDBC {
 	     
 	 }
  
- 	public int addDepartamento(Departament dep) throws SQLException {
+ 	public int addDepartamento(Departament dept) throws SQLException {
  		Connection con = GestorConnexions.obtenirConnexio();
     	
     	String sql = "INSERT INTO departaments VALUES (?,?,?)";
-    	PreparedStatement ps = con.prepareStatement(sql);
     	
-    	ps.setInt(1, dep.getCodi_dept());
-    	ps.setString(2, dep.getNom());
-    	ps.setString(3, dep.getCiutat());
+    	//aqui solo podemos poner el PreparedStatement en el try, no hay ResultSet porque es un UPDATE
+    	//al terminar el TRY se hacen close() ellos solos. ES LA VENTAJA DE HACERLO ASI
     	
-    	return ps.executeUpdate();
+    	try(PreparedStatement ps = con.prepareStatement(sql)){
+    		//respetar el orden de los values de la senteciaSQL
+	    	ps.setInt(1, dept.getCodi_dept());
+	    	ps.setString(2, dept.getNom());
+	    	ps.setString(3, dept.getCiutat());
+	    	
+	    	return ps.executeUpdate();
+    	}
  	}
  	
  	public int addEmpleat(Empleat emp)throws SQLException {
@@ -139,12 +148,13 @@ public class GestorJDBC {
  				+ "WHERE codi_dept = ?";
  		
  		try(PreparedStatement preparo = con.prepareStatement(sql)){
- 			
+ 			//no puedo poner el ResultSet en el try porque es PreparedStatement y no Statement 'simple'
 	 		preparo.setInt(1,codiD);
 	 		ResultSet recibido = preparo.executeQuery();
  		
 	 		if(recibido.next()) return (new Departament(recibido.getInt(1),recibido.getString(2),recibido.getString(3)));
 	 		
+	 		//devolvemos null para saber que no ha encontrado el departament  con el codigo
 	 		return null;
  		}
  				

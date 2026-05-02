@@ -21,6 +21,7 @@ public class Consultas {
 		while(!opcion.equals("0")) {
 			
 			pintarMenu();
+			
 			opcion = sc.nextLine();
 			
 			try {
@@ -32,8 +33,8 @@ public class Consultas {
 			switch(filtro) {
 				
 			case 1:
-				try 
-				{
+				//MOSTRAR DEPARTAMENTOS
+				try {
 					listado_resultado = gestor.MostrarDepartamentos(false);
 
 				} catch (SQLException e) {
@@ -48,6 +49,7 @@ public class Consultas {
 				break;
 				
 			case 2:
+				//MOSTRAR LOS TRABAJADORES DE LOS DEPARTAMENTOS
 				try 
 				{
 					listado_resultado = gestor.MostrarDepartamentos(true);
@@ -71,6 +73,7 @@ public class Consultas {
 				break;
 				
 			case 3:
+				//CREAR DEPARTAMENTO Y AÑADIR A BD
 				System.out.println("indique el nombre del departamento:");
 				String nomD = sc.nextLine();
 				System.out.println("indique la ciudad donde está:");
@@ -98,6 +101,7 @@ public class Consultas {
 				break;
 				
 			case 4:
+				//ELIMINAR DEPARTAMENTO DE LA BD
 				System.out.println("Indique el ID del departamento: ");
 				try {
 					int codi_dep = Integer.parseInt(sc.nextLine());
@@ -121,6 +125,7 @@ public class Consultas {
 				break;
 				
 			case 5:
+				//ELIMINAR EMPLEADO
 				System.out.println("Introduce el ID del empleado: ");
 				
 				try {
@@ -144,6 +149,7 @@ public class Consultas {
 				
 				break;
 			case 6:
+				//AÑADIR EMPLEADO A LA BD
 				try {
 					System.out.println("Introduce el ID del empleado: ");
 					int codi_e =Integer.parseInt(sc.nextLine()); 
@@ -167,7 +173,9 @@ public class Consultas {
 						if(respuesta == 0)System.out.println("No se ha añadido nada");
 						else System.out.println("Se ha añadido el trabajador");
 					}
+					
 					else System.out.println("id de departamento no válido");
+					
 				} catch (SQLException e) {
 					
 					System.out.println("error -> "+e.getErrorCode());
@@ -178,6 +186,7 @@ public class Consultas {
 				
 				break;
 			case 7:
+				//AUMENTO DE SALARIO A DEPT
 				System.out.println("indica el código del departamento: ");
 				try {
 					int codi_d = Integer.parseInt(sc.nextLine());
@@ -185,10 +194,14 @@ public class Consultas {
 					double cantidad = Double.parseDouble(sc.nextLine());
 					
 					Departament filtrado = gestor.consultaDepartamentPerCodi(codi_d);
-					int empModificados = gestor.aumentarSalarioPorDepartamento(filtrado, (cantidad/100)+1);
 					
-					if(empModificados > 0) System.out.println("Se ha subido el sueldo a "+empModificados+" empleados de:\n"+filtrado);
-					else if(empModificados == 0) System.out.println("no se ha modificado ni 1 salario");
+					if(filtrado != null) {
+						int empModificados = gestor.aumentarSalarioPorDepartamento(filtrado, (cantidad/100.0)+1);
+						
+						if(empModificados > 0) System.out.println("Se ha subido el sueldo a "+empModificados+" empleados de:\n"+filtrado);
+						else if(empModificados == 0) System.out.println("no se ha modificado ni 1 salario");
+					}
+					else System.out.println("Departamento no encontrado");
 					
 				} catch (NumberFormatException e) {
 					
@@ -200,6 +213,7 @@ public class Consultas {
 				
 				break;
 			case 8:
+				//AUMENTO DE COMISION A EMP
 				System.out.println("Introduce el ID del empleado: ");
 				
 				try {
