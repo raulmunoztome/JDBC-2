@@ -64,6 +64,7 @@ public class Consultas {
 							
 							System.out.println(e);
 						}
+						System.out.println("");
 					}
 					
 				} catch (SQLException e) {
@@ -241,7 +242,21 @@ public class Consultas {
 				}
 				
 				break;
-				
+			case 9:
+				//CONSULTAR ULTIMO LISTADO GUARDADO
+				if(listado_resultado.isEmpty()) System.out.println("No has hecho ninguna consulta");
+				else {
+					for(Departament d : listado_resultado) {
+						
+						System.out.println(d);
+						
+						for(Empleat e : d.getEmpleados()) {
+							
+							System.out.println(e);
+						}
+						System.out.println("");
+					}
+				}
 			default:
 				break;
 			}
@@ -257,14 +272,15 @@ public class Consultas {
 	
 	public static void pintarMenu() {
 		System.out.println("indique el número de la opción:\n");
-		System.out.println("1 -> Mostrar Departamentos.");
-		System.out.println("2 -> Mostrar Empleados.");
+		System.out.println("1 -> Consultar Departamentos.");
+		System.out.println("2 -> Consultar Departamentos y sus empleados.");
 		System.out.println("3 -> Añadir un departamento a la BD.");
 		System.out.println("4 -> Eliminar un departamento de la BD.");
 		System.out.println("5 -> Eliminar un empleado de la BD.");
 		System.out.println("6 -> Añadir empleado a la BD." );
 		System.out.println("7 -> Aumentar salario a los trabajadores de un departamento. en %");
 		System.out.println("8 -> Modificar la comisión de un empleado.");
+		System.out.println("9 -> Ver la última consulta realizada");
 		System.out.println("0 -> SALIR");
 		
 	}

@@ -7,7 +7,10 @@ public class GestorConnexions {
 	private static Connection connexio = null;
 
 	private static int connectar() {
-
+		//elegir si utilizo Windows o Linux
+		//String url = "jdbc:mysql://localhost/bd_empleats";
+		//String user = "cfgs";
+		//String pwd = "sol19";
 		String url = "jdbc:mysql://localhost/bd_empleats";
 		String user = "root";
 		String pwd = "";
@@ -16,8 +19,9 @@ public class GestorConnexions {
 			connexio = DriverManager.getConnection(url, user, pwd);
 			return 0;
 		} catch (SQLException e) {
+			
 			System.out.println("ERROR: " + e.getMessage());
-			// e.printStackTrace();
+			
 			return -1;
 		}
 	}

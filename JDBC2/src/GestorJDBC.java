@@ -18,58 +18,49 @@ public class GestorJDBC {
  }
  
  public Set<Departament> getDepartaments(boolean ambEmpleats) throws Exception, SQLException {
-	 
-	 String sql;
-	 Departament dep = null;
-	 Map<Integer,Departament> listado;
-     
-	 if(ambEmpleats) {
-		 
-		 listado = new HashMap<>();
-		 
-		 sql = "SELECT D.*,E.* FROM DEPARTAMENTS D"
-		 		+ " LEFT JOIN EMPLEATS E ON D.codi_dept = E.codi_dept";
-		 //no hacemos catch, ya los captura en el main APROVECHAMOs el try cerrar st, conex y resultat
-	     try (Connection conex = GestorConnexions.obtenirConnexio(); Statement st = conex.createStatement(); ResultSet resultat = st.executeQuery(sql)){
-				
-				while (resultat.next()) {
-					
-					int codi_dep = resultat.getInt(1);
-					//si no tengo el dept en el listado lo añado
-					if(!listado.containsKey(codi_dep)) {
-						dep = new Departament(codi_dep,resultat.getString(2),resultat.getString(3));
-						listado.put(codi_dep, dep);
-					}
-					
-					if(resultat.getObject(4) != null){
-						//evitamos crear empleados para departamentos SIN empleados
-					Empleat emp = new Empleat(listado.get(codi_dep),resultat.getInt(4),resultat.getString(5),resultat.getString(6),
-							resultat.getDate(7).toLocalDate(),resultat.getDouble(8),resultat.getDouble(9));
-					
-					listado.get(codi_dep).addEmpleado(emp);
-					}
-					
-				}
-				
-				return new HashSet<>(listado.values());
-				
-			} 
-	     
-	 }
-	 
-		 sql = "SELECT * FROM DEPARTAMENTS";
-		 Set<Departament> departamentos = new HashSet<>();
-		 
-	     try (Connection conex = GestorConnexions.obtenirConnexio(); Statement st = conex.createStatement(); ResultSet resultat = st.executeQuery(sql)){
-				
-				while (resultat.next()) {
-					dep = new Departament(resultat.getInt(1),resultat.getString(2),resultat.getString(3));
-					departamentos.add(dep);
-				}
-				return departamentos;
-			} 
-	     
-	 }
+	    Map<Integer, Departament> listado = new HashMap<>();
+	    
+	    // Decidimos la consulta según el parámetro
+	    String sql = ambEmpleats ? 
+	    	"SELECT D.*, E.* FROM DEPARTAMENTS D LEFT JOIN EMPLEATS E ON D.codi_dept = E.codi_dept"
+	        : "SELECT * FROM DEPARTAMENTS";
+
+	    try (Connection conex = GestorConnexions.obtenirConnexio(); 
+	         Statement st = conex.createStatement(); 
+	         ResultSet resultat = st.executeQuery(sql)) {
+	        
+	        while (resultat.next()) {
+	            int codi_dep = resultat.getInt(1);
+	            
+	            //Evitamos crear un duplicado en el map
+	            Departament dep = listado.get(codi_dep);
+	            if (dep == null) {
+	            	
+	                dep = new Departament(codi_dep, resultat.getString(2), resultat.getString(3));
+	                listado.put(codi_dep, dep);
+	            }
+
+	            // evitamos crear empleados con dept vacio
+	            if (ambEmpleats && resultat.getObject(4) != null) {
+	            	
+	                Empleat emp = new Empleat(
+	                    dep, 
+	                    resultat.getInt(4), 
+	                    resultat.getString(5), 
+	                    resultat.getString(6),
+	                    resultat.getDate(7).toLocalDate(), 
+	                    resultat.getDouble(8), 
+	                    resultat.getDouble(9)
+	                    
+	                );
+	                dep.addEmpleado(emp);
+	            }
+	        }
+	    }
+	    
+	    return new HashSet<>(listado.values());
+	}
+	
  
  	public int addDepartamento(Departament dept) throws SQLException {
     	
@@ -115,6 +106,7 @@ public class GestorJDBC {
  			
 	 		try(Connection con = GestorConnexions.obtenirConnexio(); PreparedStatement prepared = con.prepareStatement(sql)){
 	 			con.setAutoCommit(false);
+	 			//para evitar errores al borrar empleados y luego no poder borrar dept
 		 		if(cascade) {
 		 	 			
 		 		 	prepared.setInt(1,dep.getCodi_dept());
@@ -161,10 +153,10 @@ public class GestorJDBC {
  		String sql = "SELECT * FROM DEPARTAMENTS "
  				+ "WHERE codi_dept = ?";
  		
- 		try(Connection con = GestorConnexions.obtenirConnexio();PreparedStatement preparo = con.prepareStatement(sql)){
+ 		try(Connection con = GestorConnexions.obtenirConnexio(); PreparedStatement preparo = con.prepareStatement(sql)){
  			
 	 		preparo.setInt(1,codiD);
-	 		try(ResultSet recibido = preparo.executeQuery();){
+	 		try(ResultSet recibido = preparo.executeQuery()){
 	 		
 	 			if(recibido.next()) return (new Departament(recibido.getInt(1),recibido.getString(2),recibido.getString(3)));
 	 			
